@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { store } from "@ecomplus/client";
 import React, {
+  ReactNode,
   createContext,
   useContext,
-  useState,
-  ReactNode,
-  useEffect,
+  useState
 } from "react";
-import { store } from "@ecomplus/client";
 import { post } from "./utils/api";
 
 interface AppState {
