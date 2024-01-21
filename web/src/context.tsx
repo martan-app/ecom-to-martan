@@ -77,7 +77,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
       storeId: appState.ecomStoreID,
       axiosConfig: {
         params: {
-          "buyers.main_email%": "talissonf@gmail.com",
+          // "buyers.main_email%": "talissonf@gmail.com",
           limit: 1000,
           sort: "-created_at",
           "fulfillment_status.current": "delivered",
