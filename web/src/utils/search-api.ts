@@ -6,7 +6,7 @@ export function searchApi(ids: any, storeId: number) {
       method: "get",
       headers: {
         "X-Store-Id": storeId,
-      },
+      } as any,
     }
   ).then(async (response) => {
     if (response.status >= 400 && response.status < 600) {

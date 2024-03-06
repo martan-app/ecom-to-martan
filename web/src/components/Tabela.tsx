@@ -74,7 +74,7 @@ export function Tabela() {
     }
   }
 
-  const rows = data?.map((item) => {
+  const rows = data?.map((item: any) => {
     const selected = ordersSelected.includes(item.id);
 
     return (
