@@ -9,12 +9,12 @@ function SyncProgress() {
   const porcentagem = (syncCount / ordersSelected.length) * 100;
 
   return (
-    <Progress.Root size="xl">
+    <Progress.Root size={35}>
       <Progress.Section
         value={+porcentagem.toFixed()}
-        color="green"
+        color="orange"
       >
-        <Progress.Label>Sincronização ({porcentagem.toFixed()}%)</Progress.Label>
+        <Progress.Label>Sincronização ({porcentagem.toFixed()}%) - Total Sincronizado {syncCount}</Progress.Label>
       </Progress.Section>
     </Progress.Root>
   );

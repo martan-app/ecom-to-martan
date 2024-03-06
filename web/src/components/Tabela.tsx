@@ -12,17 +12,25 @@ import cx from "clsx";
 import { useAppContext } from "../context";
 import classes from "./TableSelection.module.css";
 import { IconCircleCheck, IconCircleDashed, IconError404 } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
 
 export function Tabela() {
+  const [data, setData] = useState<any>([])
+  
   const {
     appState: {
-      orders: data,
+      orders,
+      filtered,
       ordersSelected,
       synchronizedOrders,
       syncWithError,
     },
     updateAppState,
   } = useAppContext();
+
+  useEffect(() => {
+    setData(filtered.length ? filtered : orders)
+  }, [orders, filtered])
 
   const toggleRow = (id: string) => {
     updateAppState({

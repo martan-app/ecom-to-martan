@@ -1,10 +1,12 @@
+/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { store } from "@ecomplus/client";
 import React, {
   ReactNode,
   createContext,
   useContext,
-  useState
+  useEffect,
+  useState,
 } from "react";
 import { post } from "./utils/api";
 
@@ -19,8 +21,12 @@ interface AppState {
   syncWithError: any[];
   syncCount: number;
   orders: any[]; // Tipo para orders depende da estrutura real dos dados
+  filtered: any[];
   dateInit: Date | null;
   dateEnd: Date | null;
+  requestReviewAt: Date | null;
+  limit: number;
+  offset: number;
   activeTab: string;
   ecomLoader: boolean;
   martanLoader: boolean;
@@ -43,11 +49,15 @@ const initialState: AppState = {
   syncCount: 0,
   isSync: false,
   orders: [],
+  filtered: [],
+  limit: 350,
+  offset: 0,
   ordersSelected: [],
   synchronizedOrders: [],
   syncWithError: [],
   dateInit: null,
   dateEnd: null,
+  requestReviewAt: null,
   activeTab: "busca",
   ecomLoader: false,
   martanLoader: false,
@@ -67,6 +77,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
     }));
   };
 
+  useEffect(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + appState.offset);
+
+    updateAppState({
+      requestReviewAt: date,
+    });
+  }, [appState.offset]);
+
   function fetch() {
     updateAppState({ ecomLoader: true });
 
@@ -78,13 +97,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
       axiosConfig: {
         params: {
           // "buyers.main_email%": "talissonf@gmail.com",
-          limit: 1000,
+          limit: appState.limit,
+          offset: appState.offset * appState.limit,
           sort: "-created_at",
           "fulfillment_status.current": "delivered",
           "created_at>": appState.dateInit,
           "created_at<": appState.dateEnd,
           fields:
-            "source_name,domain,number,status,financial_status.current,fulfillment_status.current,amount,payment_method_label,shipping_method_label,buyers._id,buyers.main_email,buyers.display_name,buyers.phones,buyers.doc_number,transactions.payment_link,transactions.intermediator.transaction_code,items.product_id,items.sku,items.picture,items.name,items.quantity,extra_discount.discount_coupon,extra_discount.app.label,created_at,updated_at",
+            "fulfillments,created_at,updated_at,source_name,domain,number,status,financial_status.current,fulfillment_status.current,amount,payment_method_label,shipping_method_label,buyers._id,buyers.main_email,buyers.name,buyers.display_name,buyers.phones,buyers.doc_number,transactions.payment_link,transactions.intermediator.transaction_code,items.product_id,items.sku,items.picture,items.slug,items.name,items.quantity,extra_discount.discount_coupon,extra_discount.app.label,created_at,updated_at",
         },
       },
     })
@@ -123,8 +143,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
         let i = 0;
         const next = () => {
           i++;
-          setTimeout(() => job(), 1500);
+          setTimeout(() => job(), 100);
         };
+
         const job = () => {
           const orderId = ordersSelected[i];
           if (orderId) {
@@ -132,9 +153,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
             if (order) {
               post(
                 order,
-                "https://martan.app",
+                order.domain,
                 appState.martanStoreID,
-                appState.martanToken
+                appState.martanToken,
+                appState.requestReviewAt,
+                appState
               )
                 .then(() => {
                   const newValue = synchronizedOrders;
